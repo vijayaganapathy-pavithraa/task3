@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Task 03 — Submit Sample</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Share Tech Mono',monospace;background:#0a0e1a;color:#c8f0d0;min-height:100vh;padding:2rem 1rem;display:flex;align-items:center;justify-content:center;}
+.container{max-width:560px;width:100%;background:#0d1520;border:1px solid #2a4a3a;border-radius:12px;padding:2rem;}
+.task-num{font-size:.65rem;color:#3a5a4a;letter-spacing:2px;margin-bottom:.4rem;}
+.task-title{font-family:'Orbitron',monospace;color:#e8ff6b;font-size:1rem;margin-bottom:.2rem;letter-spacing:2px;}
+.task-room{font-size:.65rem;color:#3a5a4a;letter-spacing:2px;margin-bottom:1rem;}
+.task-desc{font-size:.75rem;color:#8ab09a;line-height:1.7;margin-bottom:1.4rem;}
+.game-frame{border:1px solid #1a3a2a;border-radius:8px;background:#060d14;padding:1rem;font-size:.75rem;}
+.result-banner{display:none;margin-top:.8rem;padding:.6rem 1rem;border-radius:6px;font-family:'Orbitron',monospace;font-size:.75rem;text-align:center;letter-spacing:1px;}
+.result-banner.win{background:#0a2a1a;color:#2ecc71;border:1px solid #0a4a2a;display:block;}
+.result-banner.lose{background:#2a0a0a;color:#e74c3c;border:1px solid #4a1a1a;display:block;}
+.restart-btn{display:block;width:100%;margin-top:1rem;padding:.7rem;background:#1a3a2a;color:#2ecc71;border:1px solid #2ecc71;border-radius:6px;font-family:'Orbitron',monospace;font-size:.7rem;font-weight:700;letter-spacing:2px;cursor:pointer;text-align:center;}
+.restart-btn:hover{background:#2ecc71;color:#0a0e1a;}
+.quiz-q{color:#c8f0d0;font-size:.75rem;line-height:1.6;margin-bottom:.8rem;}
+.quiz-opts{display:flex;flex-direction:column;gap:.4rem;}
+.quiz-opt{background:#0a1520;border:1px solid #1a3a2a;border-radius:5px;padding:.5rem .8rem;cursor:pointer;font-size:.7rem;color:#8ab09a;transition:all .15s;text-align:left;}
+.quiz-opt:hover{border-color:#e8ff6b;color:#e8ff6b;}
+.quiz-opt.correct{background:#0a2a1a;border-color:#2ecc71;color:#2ecc71;}
+.quiz-opt.wrong{background:#2a0a0a;border-color:#e74c3c;color:#e74c3c;}
+.quiz-progress{font-size:.65rem;color:#3a5a4a;margin-bottom:.6rem;letter-spacing:1px;}
+.quiz-btn{margin-top:.8rem;padding:.5rem 1rem;background:#1a3a2a;border:1px solid #2ecc71;color:#2ecc71;border-radius:5px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:1px;}
+.quiz-btn:hover{background:#2ecc71;color:#0a0e1a;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="task-num">TASK 03 · EASY</div>
+  <div class="task-title">🧫 Submit Sample</div>
+  <div class="task-room">MEDBAY — Room 3 · Lab Counter</div>
+  <div class="task-desc">Identify the correct sample vial from the astro-biology database. Answer the question to unlock the scanner and confirm your submission.</div>
+  <div class="game-frame" id="gameFrame"></div>
+  <div class="result-banner" id="resultBanner"></div>
+  <button class="restart-btn" id="restartBtn" style="display:none" onclick="start()">↺ RESTART TASK</button>
+</div>
+<script>
+const quizData=[
+  {q:"Which planet in our Solar System is most likely to harbour microbial life in its subsurface ocean?",opts:["Mars","Europa","Titan","Mercury"],ans:1},
+  {q:"What gas makes up most of Earth's atmosphere?",opts:["Oxygen","Carbon Dioxide","Nitrogen","Argon"],ans:2},
+  {q:"The Hubble Space Telescope orbits at approximately what altitude?",opts:["200 km","550 km","1,200 km","36,000 km"],ans:1}
+];
+function taskComplete(){
+  document.getElementById('resultBanner').className='result-banner win';
+  document.getElementById('resultBanner').textContent='✔ TASK COMPLETE — GOOD WORK, CREWMATE';
+  document.getElementById('restartBtn').style.display='block';
+}
+function taskFailed(msg){
+  document.getElementById('resultBanner').className='result-banner lose';
+  document.getElementById('resultBanner').textContent='✘ '+(msg||'TASK FAILED — TRY AGAIN');
+}
+function start(){
+  document.getElementById('resultBanner').className='result-banner';
+  document.getElementById('resultBanner').textContent='';
+  document.getElementById('restartBtn').style.display='none';
+  initQuiz();
+}
+function initQuiz(){
+  const qs=[...quizData];
+  let idx=0,score=0,answered=false;
+  const frame=document.getElementById('gameFrame');
+  function render(){
+    if(idx>=qs.length){
+      if(score===qs.length){
+        frame.innerHTML=`<div style="text-align:center;padding:1rem;color:#2ecc71;font-family:'Orbitron',monospace;font-size:.85rem;">ALL ${qs.length}/${qs.length} CORRECT!<br><br>⭐ SAMPLE ACCEPTED</div>`;
+        setTimeout(taskComplete,600);
+      } else {
+        frame.innerHTML=`<div style="text-align:center;padding:1rem;color:#e74c3c;font-family:'Orbitron',monospace;font-size:.85rem;">SCORE: ${score}/${qs.length}<br><br>✘ SAMPLE REJECTED</div><button class="quiz-btn" onclick="start()">↺ RETRY</button>`;
+        taskFailed(`Score: ${score}/${qs.length} — Sample rejected`);
+      }
+      return;
+    }
+    const q=qs[idx];answered=false;
+    frame.innerHTML=`
+      <div class="quiz-progress">QUESTION ${idx+1} / ${qs.length} &nbsp;·&nbsp; SCORE: ${score}</div>
+      <div class="quiz-q">${q.q}</div>
+      <div class="quiz-opts">${q.opts.map((o,i)=>`<button class="quiz-opt" data-i="${i}">${o}</button>`).join('')}</div>
+      <div id="quizFeedback" style="font-size:.7rem;margin-top:.6rem;min-height:1rem;"></div>
+      <button class="quiz-btn" id="nextBtn" style="display:none;" onclick="nextQ()">NEXT →</button>`;
+    document.querySelectorAll('.quiz-opt').forEach(btn=>{
+      btn.onclick=function(){
+        if(answered)return;answered=true;
+        const chosen=parseInt(this.dataset.i);
+        document.querySelectorAll('.quiz-opt').forEach(b=>b.style.pointerEvents='none');
+        if(chosen===q.ans){this.classList.add('correct');score++;document.getElementById('quizFeedback').style.color='#2ecc71';document.getElementById('quizFeedback').textContent='✔ Correct!';}
+        else{this.classList.add('wrong');document.querySelectorAll('.quiz-opt')[q.ans].classList.add('correct');document.getElementById('quizFeedback').style.color='#e74c3c';document.getElementById('quizFeedback').textContent='✘ Wrong! The correct answer is highlighted.';}
+        document.getElementById('nextBtn').style.display='inline-block';
+      };
+    });
+  }
+  window.nextQ=function(){idx++;render();};
+  render();
+}
+start();
+</script>
+</body>
+</html>
